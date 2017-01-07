@@ -9,6 +9,7 @@ import (
 	"github.com/BurntSushi/xgbutil"
 	"pkg.deepin.io/dde/api/drandr"
 	"pkg.deepin.io/lib/dbus"
+	"strings"
 	"sync"
 	"time"
 )
@@ -128,6 +129,10 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 	var cmd = "xrandr "
 	startx := uint16(0)
 	for _, output := range outputs {
+		if strings.Contains(strings.ToLower(output.Name), "hdmi") {
+			continue
+		}
+
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
 		var mode drandr.ModeInfo = modes.Best()

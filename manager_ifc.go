@@ -6,6 +6,9 @@ func (m *Manager) ListConnectedOutput() []OutputInfo {
 	connected := m.outputInfos.ListValidOutputs().ListConnectionOutputs()
 	var infos []OutputInfo
 	for _, output := range connected {
+		if output.Crtc.Width == 0 || output.Crtc.Height == 0 {
+			continue
+		}
 		infos = append(infos, OutputInfo{
 			Name:   output.Name,
 			X:      output.Crtc.X,

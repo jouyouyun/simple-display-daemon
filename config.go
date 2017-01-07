@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"pkg.deepin.io/lib/strv"
+	"strings"
 )
 
 var (
@@ -24,6 +25,9 @@ func checkOutputConfigValidity(names []string, infos []OutputInfo) bool {
 	}
 
 	for _, info := range infos {
+		if strings.Contains(strings.ToLower(info.Name), "hdmi") {
+			return false
+		}
 		if !strv.Strv(names).Contains(info.Name) {
 			return false
 		}
