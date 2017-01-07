@@ -18,7 +18,7 @@ import (
 // 3. no black screen and no suspend [X]
 // 4. loop to query output state
 // 5. move window to special position [X]
-// 6. draw background
+// 6. draw background [X]
 // 7. keybinding [X]
 
 type Manager struct {

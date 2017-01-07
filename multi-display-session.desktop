@@ -1,0 +1,4 @@
+[Desktop Entry]
+Name=Deepin Multi Display
+Comment=Deepin Multi Display
+Exec=/usr/bin/multi-display-session

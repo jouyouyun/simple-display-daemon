@@ -33,11 +33,11 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 	accel := modStr + "-" + key
 	switch {
 	case isAccelEqual(m.xu, accel, "control-mod1-t"):
-		logger.Info("Will launch deepin-terminal")
+		logger.Info("Will launch terminal")
 		go func() {
-			err := exec.Command("/bin/sh", "-c", "exec deepin-terminal").Run()
+			err := exec.Command("/bin/sh", "-c", "exec x-terminal-emulator").Run()
 			if err != nil {
-				logger.Error("Failed to open deepin-terminal:", err)
+				logger.Error("Failed to open terminal:", err)
 			}
 		}()
 	case isAccelEqual(m.xu, accel, "control-mod1-delete"):
