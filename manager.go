@@ -10,6 +10,7 @@ import (
 	"pkg.deepin.io/dde/api/drandr"
 	"pkg.deepin.io/lib/dbus"
 	"sync"
+	"time"
 )
 
 // TODO:
@@ -75,8 +76,9 @@ func newManager() (*Manager, error) {
 }
 
 func (m *Manager) init() {
+	m.checkScreenStatus()
 	m.joinExtendMode()
-	m.handleScreenChanged()
+	m.updateOutputInfo()
 }
 
 func (m *Manager) destroy() {
@@ -85,6 +87,22 @@ func (m *Manager) destroy() {
 	}
 	m.conn.Close()
 	m.conn = nil
+}
+
+func (m *Manager) checkScreenStatus() {
+	// if all output was invalid, wait until output validity
+	for {
+		if len(m.outputInfos) != 0 && len(m.modeInfos) != 0 {
+			break
+		}
+
+		err := doAction("xrandr --auto")
+		if err != nil {
+			logger.Warningf("Try open output failed %v, try again", err)
+		}
+		time.Sleep(time.Second * 2)
+		m.updateOutputInfo()
+	}
 }
 
 func (m *Manager) joinExtendMode() {
@@ -155,6 +173,7 @@ func (m *Manager) handleEventChanged() {
 			continue
 		}
 		m.eventLocker.Lock()
+		logger.Info("[Debug] output event:", e.String())
 		switch ee := e.(type) {
 		case randr.NotifyEvent:
 			switch ee.SubCode {
@@ -163,7 +182,7 @@ func (m *Manager) handleEventChanged() {
 			case randr.NotifyOutputProperty:
 			}
 		case randr.ScreenChangeNotifyEvent:
-			m.handleScreenChanged()
+			m.updateOutputInfo()
 		case xproto.KeyPressEvent:
 			m.handleKeyPressEvent(ee)
 		}
@@ -171,7 +190,7 @@ func (m *Manager) handleEventChanged() {
 	}
 }
 
-func (m *Manager) handleScreenChanged() {
+func (m *Manager) updateOutputInfo() {
 	screenInfo, err := drandr.GetScreenInfo(m.conn)
 	if err != nil {
 		logger.Error("Failed to get screen info:", err)
