@@ -8,15 +8,29 @@ import (
 	"strings"
 )
 
-var (
-	outputConfigFile = os.Getenv("HOME") + "/.config/deepin/display-manager/outputs.json"
-	appConfigFile    = os.Getenv("HOME") + "/.config/deepin/display-manager/apps.json"
+const (
+	defaultOutputFile = "/usr/share/multi-display-session/outputs.json"
+	defaultAppsFile   = "/usr/share/multi-display-session/autostart"
 )
 
-type AppInfo struct {
-	Name string
-	X    int16
-	Y    int16
+var (
+	outputConfigFile = os.Getenv("HOME") + "/.config/multi-display-session/outputs.json"
+	appConfigFile    = os.Getenv("HOME") + "/.config/multi-display-session/autostart"
+)
+
+func launchApps() {
+	apps, err := newAppsFromFile(appConfigFile)
+	if err != nil {
+		apps, err = newAppsFromFile(defaultAppsFile)
+		if err != nil {
+			logger.Error("No apps config found:", err)
+			return
+		}
+	}
+
+	for _, app := range apps {
+		go runApp(app)
+	}
 }
 
 func checkOutputConfigValidity(names []string, infos []OutputInfo) bool {
@@ -44,13 +58,14 @@ func newOutputInfosFromFile(file string) ([]OutputInfo, error) {
 	return infos, nil
 }
 
-func newAppInfosFromFile(file string) ([]AppInfo, error) {
-	var infos []AppInfo
-	err := jsonUnmarshalFromFile(file, &infos)
+func newAppsFromFile(file string) ([]string, error) {
+	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
-	return infos, nil
+	lines := strv.Strv(strings.Split(string(content), "\n"))
+	lines = lines.FilterEmpty()
+	return []string(lines), nil
 }
 
 func jsonUnmarshalFromFile(file string, value interface{}) error {

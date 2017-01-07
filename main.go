@@ -33,7 +33,8 @@ func main() {
 	m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
 	m.inhibit()
 	m.grabAccels()
-	m.handleEventChanged()
+	go m.handleEventChanged()
+	launchApps()
 	err = dbus.Wait()
 	if err != nil {
 		logger.Error("Lost dbus connection:", err)

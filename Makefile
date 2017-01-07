@@ -15,4 +15,6 @@ install:
 	mkdir -p ${PREFIX}/bin/
 	cp -f ${TARGET} ${PREFIX}/bin/
 	mkdir -p ${PREFIX}/share/xsessions/
-	cp multi-display-session.desktop ${PREFIX}/share/xsessions/
+	cp ${TARGET}.desktop ${PREFIX}/share/xsessions/
+	mkdir -p ${PREFIX}/share/${TARGET}
+	cp data/* ${PREFIX}/share/${TARGET}/

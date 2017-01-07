@@ -111,7 +111,10 @@ func (m *Manager) joinExtendMode() {
 	names := connected.ListNames()
 	infos, _ := newOutputInfosFromFile(outputConfigFile)
 	if len(infos) == 0 {
-		goto output
+		infos, _ = newOutputInfosFromFile(defaultOutputFile)
+		if len(infos) == 0 {
+			goto output
+		}
 	}
 
 	if !checkOutputConfigValidity(names, infos) {
