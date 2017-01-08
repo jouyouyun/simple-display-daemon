@@ -37,10 +37,17 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 	case isAccelEqual(m.xu, accel, "mod4-r"):
 		logger.Info("Will launch startdde")
 		if startddeLuanched {
-			go runApp("systemctl --user stop startdde.scope")
-			m.inhibit()
-			startddeLuanched = false
-			return
+			go func() {
+				err := runApp("systemctl --user stop startdde.scope")
+				if err != nil {
+					logger.Error("Stop startdde failed:", err)
+					return
+				}
+				m.inhibit()
+				m.init()
+				m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
+				startddeLuanched = false
+			}()
 		}
 		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde")
 		startddeLuanched = true
