@@ -41,11 +41,11 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 				err := runApp("systemctl --user stop startdde.scope")
 				if err != nil {
 					logger.Error("Stop startdde failed:", err)
-					return
+				} else {
+					m.inhibit()
+					m.init()
+					m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
 				}
-				m.inhibit()
-				m.init()
-				m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
 				startddeLuanched = false
 			}()
 		}
