@@ -5,7 +5,6 @@ import (
 	"github.com/BurntSushi/xgbutil"
 	"github.com/BurntSushi/xgbutil/keybind"
 	"os"
-	"os/exec"
 	"pkg.deepin.io/lib/strv"
 	"strings"
 )
@@ -14,8 +13,9 @@ func (m *Manager) grabAccels() {
 	keybind.Initialize(m.xu)
 
 	var accels = []string{
-		"control-mod1-t",
-		"control-mod1-delete",
+		"mod4-r",      // startdde
+		"mod4-t",      // terminal
+		"mod4-delete", // logout
 	}
 
 	for _, accel := range accels {
@@ -26,25 +26,30 @@ func (m *Manager) grabAccels() {
 	}
 }
 
+var startddeLuanched bool = false
+
 func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 	modStr := filterInvalidMod(keybind.ModifierString(ev.State))
 	key := keybind.LookupString(m.xu, ev.State, ev.Detail)
 	logger.Infof("Key press event mod: %s, key: %s", modStr, key)
 	accel := modStr + "-" + key
 	switch {
-	case isAccelEqual(m.xu, accel, "control-mod1-t"):
+	case isAccelEqual(m.xu, accel, "mod4-r"):
+		logger.Info("Will launch startdde")
+		if startddeLuanched {
+			go runApp("systemctl --user stop startdde.scope")
+			startddeLuanched = false
+			return
+		}
+		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde.sh")
+		startddeLuanched = true
+	case isAccelEqual(m.xu, accel, "mod4-t"):
 		logger.Info("Will launch terminal")
-		go func() {
-			err := exec.Command("/bin/sh", "-c", "exec x-terminal-emulator").Run()
-			if err != nil {
-				logger.Error("Failed to open terminal:", err)
-			}
-		}()
-	case isAccelEqual(m.xu, accel, "control-mod1-delete"):
+		go runApp("x-terminal-emulator")
+	case isAccelEqual(m.xu, accel, "mod4-delete"):
 		//exit
 		os.Exit(0)
 	}
-
 }
 
 func doGrab(xu *xgbutil.XUtil, accel string) error {
