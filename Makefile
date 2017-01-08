@@ -14,8 +14,6 @@ clean:
 install:
 	mkdir -p ${PREFIX}/bin/
 	cp -f ${TARGET} ${PREFIX}/bin/
-	cp -f startdde.sh ${PREFIX}/bin/
-	chmod +x ${PREFIX}/bin/startdde.sh
 	mkdir -p ${PREFIX}/share/xsessions/
 	cp ${TARGET}.desktop ${PREFIX}/share/xsessions/
 	mkdir -p ${PREFIX}/share/${TARGET}

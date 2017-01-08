@@ -33,6 +33,7 @@ func main() {
 	m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
 	m.inhibit()
 	m.grabAccels()
+	go runApp("pulseaudio")
 	go m.handleEventChanged()
 	launchApps()
 	err = dbus.Wait()

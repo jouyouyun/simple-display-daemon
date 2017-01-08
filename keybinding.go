@@ -38,10 +38,11 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 		logger.Info("Will launch startdde")
 		if startddeLuanched {
 			go runApp("systemctl --user stop startdde.scope")
+			m.inhibit()
 			startddeLuanched = false
 			return
 		}
-		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde.sh")
+		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde")
 		startddeLuanched = true
 	case isAccelEqual(m.xu, accel, "mod4-t"):
 		logger.Info("Will launch terminal")
