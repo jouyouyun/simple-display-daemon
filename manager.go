@@ -34,6 +34,8 @@ type Manager struct {
 
 	outputLocker sync.Mutex
 	eventLocker  sync.Mutex
+
+	Changed func()
 }
 
 type OutputInfo struct {
@@ -131,6 +133,10 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 	var cmd = "xrandr "
 	startx := uint16(0)
 	for _, output := range outputs {
+		if !canReadEDID(output.Name) {
+			logger.Warning("Failed to read edid for:", output.Name)
+			continue
+		}
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
 		var mode drandr.ModeInfo = modes.Best()
@@ -141,7 +147,7 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 		startx += mode.Width
 	}
 
-	logger.Info("[joinExtendModeFromOutputs] command:", cmd)
+	logger.Debug("[joinExtendModeFromOutputs] command:", cmd)
 	err := doAction(cmd)
 	if err != nil {
 		logger.Error("[joinExtendModeFromOutputs] failed:", err)
@@ -151,11 +157,15 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 func (m *Manager) joinExtendModeFromConfigInfos(infos []OutputInfo) {
 	var cmd = "xrandr "
 	for _, info := range infos {
+		if !canReadEDID(info.Name) {
+			logger.Warning("Failed to read edid for:", info.Name)
+			continue
+		}
 		cmd += " --output " + info.Name
 		cmd += fmt.Sprintf(" --mode %dx%d --pos %dx%d ", info.Width, info.Height, info.X, info.Y)
 	}
 
-	logger.Info("[joinExtendModeFromConfigInfos] command:", cmd)
+	logger.Debug("[joinExtendModeFromConfigInfos] command:", cmd)
 	err := doAction(cmd)
 	if err != nil {
 		logger.Error("[joinExtendModeFromConfigInfos] failed:", err)
@@ -176,12 +186,13 @@ func (m *Manager) handleEventChanged() {
 			continue
 		}
 		m.eventLocker.Lock()
-		logger.Info("[Debug] output event:", e.String())
+		logger.Debug("[Debug] output event:", e.String())
 		switch ee := e.(type) {
 		case randr.NotifyEvent:
 			switch ee.SubCode {
 			case randr.NotifyCrtcChange:
 			case randr.NotifyOutputChange:
+				m.updateOutputInfo()
 			case randr.NotifyOutputProperty:
 			}
 		case randr.ScreenChangeNotifyEvent:
@@ -203,6 +214,12 @@ func (m *Manager) updateOutputInfo() {
 	m.outputInfos, m.modeInfos = screenInfo.Outputs, screenInfo.Modes
 	m.width, m.height = screenInfo.GetScreenSize()
 	m.outputLocker.Unlock()
+
+	oldLen := len(prevConnected)
+	now := m.ListConnectedOutput()
+	if oldLen != len(now) {
+		dbus.Emit(m, "Changed")
+	}
 }
 
 func (m *Manager) getOutputModes(name string) drandr.ModeInfos {
@@ -220,7 +237,7 @@ func (m *Manager) inhibit() {
 	// dpms.SetTimeouts(m.conn, 0, 0, 0)
 	err := dpms.DisableChecked(m.conn).Check()
 	if err != nil {
-		logger.Info("Failed to disable dpms:", err)
+		logger.Warning("Failed to disable dpms:", err)
 	}
 }
 

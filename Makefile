@@ -9,7 +9,7 @@ ${TARGET}:
 	go build -o ${TARGET}
 
 clean:
-	rm ${TARGET}
+	rm -rf ${TARGET}
 
 install:
 	mkdir -p ${PREFIX}/bin/

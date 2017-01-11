@@ -31,11 +31,11 @@ var startddeLuanched bool = false
 func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 	modStr := filterInvalidMod(keybind.ModifierString(ev.State))
 	key := keybind.LookupString(m.xu, ev.State, ev.Detail)
-	logger.Infof("Key press event mod: %s, key: %s", modStr, key)
+	logger.Debugf("Key press event mod: %s, key: %s", modStr, key)
 	accel := modStr + "-" + key
 	switch {
 	case isAccelEqual(m.xu, accel, "mod4-r"):
-		logger.Info("Will launch startdde")
+		logger.Debug("Will launch startdde")
 		if startddeLuanched {
 			go func() {
 				err := runApp("systemctl --user stop startdde.scope")
@@ -52,7 +52,7 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde")
 		startddeLuanched = true
 	case isAccelEqual(m.xu, accel, "mod4-t"):
-		logger.Info("Will launch terminal")
+		logger.Debug("Will launch terminal")
 		go runApp("x-terminal-emulator")
 	case isAccelEqual(m.xu, accel, "mod4-delete"):
 		//exit
