@@ -30,7 +30,7 @@ func main() {
 	dbus.DealWithUnhandledMessage()
 
 	m.init()
-	m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
+	m.drawBackground(int(m.width), int(m.height))
 	m.inhibit()
 	m.grabAccels()
 	go runApp("pulseaudio")

@@ -38,19 +38,22 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 		logger.Debug("Will launch startdde")
 		if startddeLuanched {
 			go func() {
-				err := runApp("systemctl --user stop startdde.scope")
+				runApp("killall dde-session-daemon dde-dock dde-dock-applets dde-desktop dde-launcher dde-control-center")
+				err := runApp("killall startdde")
 				if err != nil {
 					logger.Error("Stop startdde failed:", err)
 				} else {
 					m.inhibit()
 					m.init()
-					m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
+					logger.Info("--------Draw background again!!!")
+					m.drawBackground(int(m.width), int(m.height))
 				}
 				startddeLuanched = false
 			}()
+		} else {
+			go runApp("startdde")
+			startddeLuanched = true
 		}
-		go runApp("systemd-run  --scope --user --unit startdde /usr/bin/startdde")
-		startddeLuanched = true
 	case isAccelEqual(m.xu, accel, "mod4-t"):
 		logger.Debug("Will launch terminal")
 		go runApp("x-terminal-emulator")

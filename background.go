@@ -5,9 +5,7 @@ import (
 	"image"
 )
 
-const defaultBackgroundFile = "/usr/share/backgrounds/deepin/desktop.jpg"
-
-func (m *Manager) drawBackground(bg string, w, h int) {
+func (m *Manager) drawBackground(w, h int) {
 	img := xgraphics.New(m.xu, image.Rect(0, 0, w, h))
 	for i := 0; i < w; i++ {
 		for j := 0; j < h; j++ {
