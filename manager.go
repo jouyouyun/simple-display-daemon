@@ -35,6 +35,8 @@ type Manager struct {
 	outputLocker sync.Mutex
 	eventLocker  sync.Mutex
 
+	extendMode bool
+
 	Changed func()
 }
 
@@ -72,13 +74,14 @@ func newManager() (*Manager, error) {
 		root:        xproto.Setup(xu.Conn()).DefaultScreen(xu.Conn()).Root,
 		outputInfos: screenInfo.Outputs,
 		modeInfos:   screenInfo.Modes,
+		extendMode:  false,
 	}
 	m.width, m.height = screenInfo.GetScreenSize()
 	return m, nil
 }
 
 func (m *Manager) init() {
-	m.checkScreenStatus()
+	// m.checkScreenStatus()
 	m.joinExtendMode()
 	m.updateOutputInfo()
 }
@@ -137,6 +140,7 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 			logger.Warning("Failed to read edid for:", output.Name)
 			continue
 		}
+		m.extendMode = true
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
 		var mode drandr.ModeInfo = modes.Best()
@@ -165,6 +169,7 @@ func (m *Manager) joinExtendModeFromConfigInfos(infos []OutputInfo) {
 			logger.Warning("Failed to read edid for:", info.Name)
 			continue
 		}
+		m.extendMode = true
 		cmd += " --output " + info.Name
 		cmd += fmt.Sprintf(" --mode %dx%d --pos %dx%d ", info.Width, info.Height, info.X, info.Y)
 		if !primary && info.X == 0 {
@@ -205,6 +210,9 @@ func (m *Manager) handleEventChanged() {
 			}
 		case randr.ScreenChangeNotifyEvent:
 			m.updateOutputInfo()
+			if !m.extendMode {
+				m.joinExtendMode()
+			}
 		case xproto.KeyPressEvent:
 			m.handleKeyPressEvent(ee)
 		}
