@@ -30,10 +30,11 @@ func main() {
 	dbus.DealWithUnhandledMessage()
 
 	m.init()
+	go runApp("pulseaudio")
+	go runApp("compiz")
 	m.drawBackground(int(m.width), int(m.height))
 	m.inhibit()
 	m.grabAccels()
-	go runApp("pulseaudio")
 	go m.handleEventChanged()
 	launchApps()
 	err = dbus.Wait()

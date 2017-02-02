@@ -38,7 +38,7 @@ func (m *Manager) handleKeyPressEvent(ev xproto.KeyPressEvent) {
 		logger.Debug("Will launch startdde")
 		if startddeLuanched {
 			go func() {
-				runApp("killall dde-session-daemon dde-dock dde-dock-applets dde-desktop dde-launcher dde-control-center")
+				runApp("killall dde-session-daemon dde-dock mousearea dde-desktop dde-launcher deepin-menu dde-dock-applets dde-control-center")
 				err := runApp("killall startdde")
 				if err != nil {
 					logger.Error("Stop startdde failed:", err)

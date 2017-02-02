@@ -28,55 +28,60 @@ func (m *Manager) ListConnectedOutput() []OutputInfo {
 	return infos
 }
 
-const drmCard0Path = "/sys/class/drm/"
+const drmClassPath = "/sys/class/drm/"
 
 func canReadEDID(name string) bool {
-	card := getCardByName(name)
-	if len(card) == 0 {
+	list := getCardByName(name)
+	logger.Debug("[canReadEDID] Find card by name:", name, list)
+	if len(list) == 0 {
 		return false
 	}
-	var file = drmCard0Path + card + "/edid"
-	content, err := ioutil.ReadFile(file)
-	if err != nil {
-		logger.Errorf("Read edid file '%s' failed: %v", file, err)
-		return false
+	for _, card := range list {
+		var file = drmClassPath + card + "/edid"
+		content, err := ioutil.ReadFile(file)
+		if err != nil {
+			logger.Errorf("Read edid file '%s' failed: %v", file, err)
+			continue
+		}
+		if len(content) != 0 {
+			return true
+		}
 	}
-	if len(content) == 0 {
-		return false
-	}
-	return true
+	return false
 }
 
-func getCardByName(name string) string {
+func getCardByName(name string) []string {
 	cards := getAllCards()
 	if len(cards) == 0 {
-		return ""
+		return nil
 	}
+	logger.Debug("[getCardByName] all cards:", cards)
 
 	if strings.Contains(name, "-") {
 		array := strings.Split(name, "-")
 		name = strings.Join(array, "")
 	}
+	var list []string
 	for _, card := range cards {
 		array := strings.Split(card, "-")
 		tmp := strings.Join(array[1:], "")
 		if tmp == name {
-			return card
+			list = append(list, card)
 		}
 	}
-	return ""
+	return list
 }
 
 func getAllCards() []string {
-	finfos, err := ioutil.ReadDir(drmCard0Path)
+	finfos, err := ioutil.ReadDir(drmClassPath)
 	if err != nil {
-		logger.Error("Read card0 list failed:", err)
+		logger.Error("Read card list failed:", err)
 		return nil
 	}
 
 	var cards []string
 	for _, finfo := range finfos {
-		if !strings.Contains(finfo.Name(), "card0") {
+		if !strings.Contains(finfo.Name(), "card") {
 			continue
 		}
 
