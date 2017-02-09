@@ -30,6 +30,7 @@ func main() {
 	dbus.DealWithUnhandledMessage()
 
 	m.init()
+	go m.waitEDPConnected()
 	m.drawBackground(defaultBackgroundFile, int(m.width), int(m.height))
 	m.inhibit()
 	m.grabAccels()

@@ -133,10 +133,10 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 	var cmd = "xrandr "
 	startx := uint16(0)
 	for _, output := range outputs {
-		if !canReadEDID(output.Name) {
-			logger.Warning("Failed to read edid for:", output.Name)
-			continue
-		}
+		//if !canReadEDID(output.Name) {
+		//logger.Warning("Failed to read edid for:", output.Name)
+		//continue
+		//}
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
 		var mode drandr.ModeInfo = modes.Best()
@@ -161,10 +161,10 @@ func (m *Manager) joinExtendModeFromConfigInfos(infos []OutputInfo) {
 	var cmd = "xrandr "
 	primary := false
 	for _, info := range infos {
-		if !canReadEDID(info.Name) {
-			logger.Warning("Failed to read edid for:", info.Name)
-			continue
-		}
+		//if !canReadEDID(info.Name) {
+		//logger.Warning("Failed to read edid for:", info.Name)
+		//continue
+		//}
 		cmd += " --output " + info.Name
 		cmd += fmt.Sprintf(" --mode %dx%d --pos %dx%d ", info.Width, info.Height, info.X, info.Y)
 		if !primary && info.X == 0 {
