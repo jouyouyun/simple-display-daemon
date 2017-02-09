@@ -15,6 +15,7 @@ func (m *Manager) waitEDPConnected() {
 			runApp("xrandr --output eDP1 --off")
 			runApp("xrandr --output eDP1 --pos 2047x0")
 			runApp("xrandr --output eDP1 --pos 2048x0")
+			return
 		}
 	}
 }
