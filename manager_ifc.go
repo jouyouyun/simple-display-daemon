@@ -41,7 +41,8 @@ func canReadModes(name string) bool {
 
 func canReadProp(card, prop string) bool {
 	list := getCardByName(card)
-	logger.Debug("[canReadEDID] Find card by name:", card, list)
+	logger.Debug("[canReadProp] card list:", list)
+	logger.Debugf("[canReadProp] will read prop %q for %q:", prop, card)
 	if len(list) == 0 {
 		return false
 	}
