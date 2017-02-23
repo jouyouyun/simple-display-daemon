@@ -1,5 +1,5 @@
-simple-display-daemon (1.0) unstable; urgency=medium
+simple-display-daemon (2.5) unstable; urgency=medium
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release.
 
- -- unknown <aa@unknown>  Sat, 07 Jan 2017 20:47:17 +0800
+ -- unknown <unknown@unknown>  Sat, 07 Jan 2017 20:47:17 +0800

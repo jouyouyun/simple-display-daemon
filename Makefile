@@ -12,9 +12,8 @@ clean:
 	rm -rf ${TARGET}
 
 install:
-	mkdir -p ${PREFIX}/bin/
-	cp -f ${TARGET} ${PREFIX}/bin/
-	mkdir -p ${PREFIX}/share/xsessions/
-	cp ${TARGET}.desktop ${PREFIX}/share/xsessions/
-	mkdir -p ${PREFIX}/share/${TARGET}
-	cp data/* ${PREFIX}/share/${TARGET}/
+	install -Dm755 ${TARGET} ${DESTDIR}/${PREFIX}/bin/${TARGET}
+	mkdir -p ${DESTDIR}/${PREFIX}/share/xsessions/
+	install -Dm644 ${TARGET}.desktop ${DESTDIR}/${PREFIX}/share/xsessions/${TARGET}.desktop
+	mkdir -p ${DESTDIR}/${PREFIX}/share/${TARGET}
+	cp data/* ${DESTDIR}/${PREFIX}/share/${TARGET}/
