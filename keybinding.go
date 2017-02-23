@@ -94,7 +94,7 @@ func doGrab(xu *xgbutil.XUtil, accel string) error {
 
 func launchXTerm(screen int) {
 	runApp("openbox &")
-	runApp(fmt.Sprintf("xterm -geometry 100x40+%d+100", 100+(screen-1)*1024))
+	runApp(fmt.Sprintf("xterm -fa \"monospace\" -fs 10 -geometry 100x40+%d+100", 100+(screen-1)*1024))
 }
 
 func isAccelEqual(xu *xgbutil.XUtil, accel1, accel2 string) bool {
