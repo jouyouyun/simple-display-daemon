@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"pkg.deepin.io/lib/strv"
+	"pkg.deepin.io/lib/utils"
 	"strings"
 )
 
@@ -15,12 +16,15 @@ func (m *Manager) grabAccels() {
 	keybind.Initialize(m.xu)
 
 	var accels = []string{
-		"mod4-r",      // startdde
-		"mod4-t",      // terminal
-		"mod4-delete", // logout
-		"mod4-1",      // xterm
+		"mod4-1", // xterm
 		"mod4-2",
 		"mod4-3",
+	}
+
+	if utils.IsFileExist("/usr/bin/startdde") {
+		accels = append(accels, "mod4-r")      // startdde
+		accels = append(accels, "mod4-t")      // terminal
+		accels = append(accels, "mod4-delete") // logout
 	}
 
 	for _, accel := range accels {
@@ -89,10 +93,6 @@ func doGrab(xu *xgbutil.XUtil, accel string) error {
 }
 
 func launchXTerm(screen int) {
-	if isAppLaunched("xterm") {
-		runApp("killall xterm")
-		return
-	}
 	runApp("openbox &")
 	runApp(fmt.Sprintf("xterm -geometry 100x40+%d+100", 100+(screen-1)*1024))
 }
