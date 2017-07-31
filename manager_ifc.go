@@ -10,7 +10,7 @@ var prevConnected []OutputInfo
 func (m *Manager) ListConnectedOutput() []OutputInfo {
 	m.outputLocker.Lock()
 	defer m.outputLocker.Unlock()
-	connected := m.outputInfos.ListValidOutputs().ListConnectionOutputs()
+	connected := m.outputInfos.ListConnectionOutputs()
 	var infos []OutputInfo
 	for _, output := range connected {
 		//if !canReadEDID(output.Name) || output.Crtc.Width == 0 || output.Crtc.Height == 0 {

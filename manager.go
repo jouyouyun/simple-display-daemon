@@ -17,7 +17,7 @@ import (
 // 1. block output changed signal [X]
 // 2. list connected output details [X]
 // 3. no black screen and no suspend [X]
-// 4. loop to query output state
+// 4. loop to query output state [X]
 // 5. move window to special position [X]
 // 6. draw background [X]
 // 7. keybinding [X]
@@ -79,7 +79,7 @@ func newManager() (*Manager, error) {
 
 func (m *Manager) init() {
 	m.checkScreenStatus()
-	m.joinExtendMode()
+	m.joinMirrorModeFromOutputs(m.outputInfos.ListConnectionOutputs())
 	m.updateOutputInfo()
 }
 
@@ -108,7 +108,7 @@ func (m *Manager) checkScreenStatus() {
 }
 
 func (m *Manager) joinExtendMode() {
-	connected := m.outputInfos.ListValidOutputs().ListConnectionOutputs()
+	connected := m.outputInfos.ListConnectionOutputs()
 	names := connected.ListNames()
 	infos, _ := newOutputInfosFromFile(outputConfigFile)
 	if len(infos) == 0 {
@@ -139,7 +139,10 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 		//}
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
-		var mode drandr.ModeInfo = modes.Best()
+		var mode drandr.ModeInfo = modes.Max()
+		if len(output.PreferredModes) != 0 {
+			mode = modes.Query(output.PreferredModes[0])
+		}
 		if v := modes.QueryBySize(1024, 768); v.Width != 0 && v.Height != 0 {
 			mode = v
 		}
@@ -154,6 +157,28 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 	err := doAction(cmd)
 	if err != nil {
 		logger.Error("[joinExtendModeFromOutputs] failed:", err)
+	}
+}
+
+func (m *Manager) joinMirrorModeFromOutputs(outputs drandr.OutputInfos) {
+	var cmd = "xrandr "
+	for i, _ := range outputs {
+		//if !canReadEDID(output.Name) {
+		//logger.Warning("Failed to read edid for:", output.Name)
+		//continue
+		//}
+		cmd += " --output " + outputs[i].Name
+		if i == 0 {
+			cmd += " --mode 1024x768 --pos 0x0 "
+		} else {
+			cmd += fmt.Sprintf(" --same-as %s ", outputs[0].Name)
+		}
+	}
+
+	logger.Debug("[joinMirrorModeFromOutputs] command:", cmd)
+	err := doAction(cmd)
+	if err != nil {
+		logger.Error("[joinMirrorModeFromOutputs] failed:", err)
 	}
 }
 
