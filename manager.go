@@ -17,7 +17,7 @@ import (
 // 1. block output changed signal [X]
 // 2. list connected output details [X]
 // 3. no black screen and no suspend [X]
-// 4. loop to query output state
+// 4. loop to query output state [X]
 // 5. move window to special position [X]
 // 6. draw background [X]
 // 7. keybinding [X]
@@ -108,7 +108,7 @@ func (m *Manager) checkScreenStatus() {
 }
 
 func (m *Manager) joinExtendMode() {
-	connected := m.outputInfos.ListValidOutputs().ListConnectionOutputs()
+	connected := m.outputInfos.ListConnectionOutputs()
 	names := connected.ListNames()
 	infos, _ := newOutputInfosFromFile(outputConfigFile)
 	if len(infos) == 0 {
@@ -139,7 +139,10 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 		//}
 		cmd += " --output " + output.Name
 		modes := m.getOutputModes(output.Name)
-		var mode drandr.ModeInfo = modes.Best()
+		var mode drandr.ModeInfo = modes.Max()
+		if len(output.PreferredModes) != 0 {
+			mode = modes.Query(output.PreferredModes[0])
+		}
 		if v := modes.QueryBySize(1024, 768); v.Width != 0 && v.Height != 0 {
 			mode = v
 		}
