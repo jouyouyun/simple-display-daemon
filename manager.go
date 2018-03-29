@@ -143,8 +143,9 @@ func (m *Manager) joinExtendModeFromOutputs(outputs drandr.OutputInfos) {
 		if len(output.PreferredModes) != 0 {
 			mode = modes.Query(output.PreferredModes[0])
 		}
-		if v := modes.QueryBySize(1024, 768); v.Width != 0 && v.Height != 0 {
-			mode = v
+		if v := modes.QueryBySize(1024, 768); len(v) != 0 &&
+			v[0].Width != 0 && v[0].Height != 0 {
+			mode = v[0]
 		}
 		cmd += fmt.Sprintf(" --mode %dx%d --pos %dx0 ", mode.Width, mode.Height, startx)
 		if startx == 0 {

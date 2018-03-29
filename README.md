@@ -8,8 +8,8 @@ Display Daemon provides some dbus interfaces to list connected outputs
 ### Build Dependencies
 
 * golang
-* [go-lib](https://github.com/linuxdeepin/go-lib)
-* [dde-api](https://github.com/linuxdeepin/dde-api)
+* [go-lib(1.2.6)](https://github.com/linuxdeepin/go-lib)
+* [dde-api(3.1.22)](https://github.com/linuxdeepin/dde-api)
 * [xgb](https://github.com/BurntSushi/xgb)
 * [xgbutil](https://github.com/BurntSushi/xgbutil)
 * [goconvey](https://github.com/smartystreets/goconvey/convey)
