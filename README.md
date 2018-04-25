@@ -42,6 +42,11 @@ Install:
 sudo make install
 ```
 
+## Usage
+
+见 [使用方法](usage.md)
+
+
 ## Getting help
 
 Any usage issues can ask for help via
